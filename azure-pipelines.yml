@@ -42,3 +42,17 @@ stages:
             tags: |
               $(Build.BuildId)
               latest
+  - stage: CD
+    displayName: 'CD - Pipeline de CD'
+    jobs:
+    - job: Deploy
+      displayName: 'Deploy no Kubernetes'
+      steps:
+      - task: KubernetesManifest@1
+        inputs:
+          action: 'deploy'
+          connectionType: 'kubernetesServiceConnection'
+          kubernetesServiceConnection: 'k8s'
+          namespace: 'default'
+          manifests: './k8s/deployment.yaml'
+          containers: 'fabricioveronez/live-azure-devops:$(Build.BuildId)'
