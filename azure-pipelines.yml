@@ -15,10 +15,14 @@ stages:
   - stage: CI
     displayName: 'CI - Pipeline de CI'
     jobs:
-      - job: Build
-        displayName: 'Build do Projeto'
+      - job: BuildAndTest
+        displayName: 'Build do Projeto e Teste'
         steps:
         - task: DotNetCoreCLI@2
           inputs:
             command: 'build'
             projects: './src/Review-Filmes.sln'
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'test'
+            projects: './src/Review-Filmes.Test.Unit/Review-Filmes.Test.Unit.csproj'
