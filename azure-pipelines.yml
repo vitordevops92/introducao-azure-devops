@@ -1,0 +1,42 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: CI
+    displayName: 'CI - Pipeline de CI'
+    jobs:
+      - job: BuildAndTest
+        displayName: 'Build do Projeto e Teste'
+        steps:
+        - task: DotNetCoreCLI@2
+          displayName: Build
+          inputs:
+            command: 'build'
+            projects: './src/Review-Filmes.sln'
+        - task: DotNetCoreCLI@2
+          displayName: Teste
+          inputs:
+            command: 'test'
+            projects: './src/Review-Filmes.Test.Unit/Review-Filmes.Test.Unit.csproj'
+      - job: Release
+        displayName: 'Release Docker'
+        dependsOn: BuildAndTest
+        steps:
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'DockerHub'
+            repository: 'vdevops92/azure-devops'
+            command: 'buildAndPush'
+            Dockerfile: './src/Review-Filmes.Web/Dockerfile'
+            buildContext: './src'
+            tags: |
+              $(Build.BuildId)
+              latest
